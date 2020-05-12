@@ -98,7 +98,7 @@ def Swipe_it(driver):
                         real_user_stare(4)
         except NoEl.ElementClickInterceptedException:
             try:
-                btn_iRefuse = driver.find_element_by_xpath("//*[contains(text(), 'I Refuse')]").click()
+                btn_iRefuse = driver.find_element_by_xpath("//*[contains(text(), 'I Accept')]").click()
             except NoEl:
                 real_user_stare()
         # throws timeout exception(unhandled yet), but only if u interrupt
@@ -116,14 +116,19 @@ def scrap_url_list(list_of_url):
 
 def get_her_photo(driver):
     topone= driver.find_element_by_css_selector("div[class='recCard Ov(h) Cur(p) W(100%) Bgc($c-placeholder) StretchedBox Bdrs(8px) CenterAlign--ml Toa(n) active Prs(1000px) Bfv(h)']")
-    girls_name = str(topone.find_element_by_xpath(
-        '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/div/div[1]/div/div/span').get_attribute(
-        "innerHTML"))
+    girls_name = str(
+        topone.find_element_by_css_selector("#content > div > div.App__body.H\(100\%\).Pos\(r\).Z\(0\) > div > main > div.H\(100\%\) > div > div > div.recsCardboard.W\(100\%\).Mt\(a\).H\(100\%\)--s.Px\(10px\)--s.Pos\(r\) > div > div.recsCardboard__cards.Expand.Animdur\(\$fast\).Animtf\(eio\).Pos\(r\).CenterAlign.Z\(1\) > div.recCard.Ov\(h\).Cur\(p\).W\(100\%\).Bgc\(\$c-placeholder\).StretchedBox.Bdrs\(8px\).CenterAlign--ml.Toa\(n\).active.Prs\(1000px\).Bfv\(h\) > div.Pos\(a\).D\(f\).Jc\(sb\).C\(\#fff\).Ta\(start\).B\(0\).W\(100\%\).Wc\(\$transform\).P\(16px\).P\(20px\)--l > div > div.Pos\(a\).Fz\(\$l\).B\(0\).Trsdu\(\$fast\).NetWidth\(100\%\,50px\).D\(f\).Ai\(c\) > div > div > span").get_attribute("innerHTML"))
+        #
+        # topone.find_element_by_xpath(
+        # '//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[1]/div[3]/div[6]/div/div[1]/div/div/span').get_attribute(
+        # "innerHTML")) #sems to be locking once for a time especiallywhen she got 2 pics & mostly on last one in queue
+    # edit: proably it's about last person in queue. xpath selector seems to be stuck on last swiped prsn.  
     print(girls_name)
     raw_list_url = list([])
     body = driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main')
     body.click()
     tries = 3
+    i=0
     while tries > 0:
         girls = topone.find_elements_by_xpath('.//*[@aria-label="' + girls_name + '"]')
         for i in girls:
@@ -146,6 +151,7 @@ def judge_her(driver):
     if (len(photos)==1)&(photos[0].find("unknown.jpg")!=-1): #wyrzyca ludzi bez mordy
         return 1
     result=int(input('do you like her? 1-10'))
+    # result=6
     return result
 # jak 2 takie same imiona pod rząd, pobiera zdjecia 2os
 
