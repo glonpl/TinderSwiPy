@@ -1,4 +1,8 @@
-
+#Images
+*.webp
+*.jpeg
+*.jpg
+*.png
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
