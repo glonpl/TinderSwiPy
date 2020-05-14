@@ -7,7 +7,6 @@ driver.real_user_stare()
 driver.Tinder_login()
 driver.Close_popup()
 driver.real_user_stare()
-print(len(list([])))
 viewer = GUI(list([]))
 while True:
     viewer.setList(driver.get_her_photo())
