@@ -3,6 +3,9 @@
 *.jpeg
 *.jpg
 *.png
+yes/
+no/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

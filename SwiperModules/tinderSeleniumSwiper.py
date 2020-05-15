@@ -16,6 +16,9 @@ class SeleniumSwiper:
         options.add_argument('start-maximized')
         self.driver = webdriver.Chrome(options=options)
 
+    def close(self):
+        self.driver.close()
+
     # Function to simulate user staring
     def real_user_stare(self, x=1):
         import random
@@ -32,7 +35,6 @@ class SeleniumSwiper:
         self.driver.find_element_by_id("email").send_keys(f.decrypt(mail).decode())
         self.driver.find_element_by_id("pass").send_keys(f.decrypt(passwd).decode())
         self.driver.find_element_by_id("pass").submit()
-        # return self.driver
 
     # requres to be logged in on facebook
     def Tinder_login(self):
@@ -77,7 +79,7 @@ class SeleniumSwiper:
         while i != 0:
             self.real_user_stare(2)  # doesn't work as expected
             try:
-                popup1 = self.driver.find_element_by_xpath(
+                popup = self.driver.find_element_by_xpath(
                     '//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]').click()
             except exception.NoSuchElementException:
                 i = 0
@@ -85,34 +87,39 @@ class SeleniumSwiper:
     # swiper function
 
     def Swipe_it(self, result):
-        if self.driver.find_element_by_xpath('//*[contains(text(), "You\'re Out of Likes!")]').is_displayed():
-            i = 0
-            print("Tinder doesn\'t want me to date :<")
-            return False
-        try:
-            btn_noThanks = self.driver.find_element_by_xpath("//*[contains(text(), 'No Thanks')]").click()
-        except exception.ElementNotInteractableException:
-            try:
-                if (result > 0.5):
-                    like_button = w8(self.driver, 8).until(
-                        EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Like']"))).click()
-                else:
-                    dislike_button = w8(self.driver, 8).until(
-                        EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Nope']"))).click()
-            except exception.ElementClickInterceptedException:
-                try:
-                    match_button = self.driver.find_element_by_xpath("//*[contains(text(), 'Keep Swiping')]").click()
-                except exception.ElementNotInteractableException:
-                    try:
-                        not_interessted_button = self.driver.find_element_by_xpath(
-                            "//*[contains(text(), 'Not interested')]").click()
-                    except exception.ElementClickInterceptedException:
-                        self.real_user_stare(4)
-        except exception.ElementClickInterceptedException:
-            try:
-                btn_iRefuse = self.driver.find_element_by_xpath("//*[contains(text(), 'I Accept')]").click()
-            except exception:
-                self.real_user_stare()
+
+        if self.handle_exceptions():
+            return True
+
+        # if self.driver.find_element_by_xpath('//*[contains(text(), "You\'re Out of Likes!")]').is_displayed():
+        #     i = 0
+        #     print("Tinder doesn\'t want me to date :<")
+        #     return True
+        #
+        # try:
+        #     btn_noThanks = self.driver.find_element_by_xpath("//*[contains(text(), 'No Thanks')]").click()
+        # except e:
+        #     try:
+        #         match_button = self.driver.find_element_by_xpath("//*[contains(text(), 'Keep Swiping')]").click()
+        #     except e:
+        #         try:
+        #             not_interessted_button = self.driver.find_element_by_xpath(
+        #                 "//*[contains(text(), 'Not interested')]").click()
+        #         except e:
+        #             try:
+        #                 match_button_new = self.driver.find_element_by_xpath(
+        #                     "//*[contains(text(), 'Back to Tinder')]").click()
+        #             except e:
+        #                 try:
+        #                     btn_iRefuse = self.driver.find_element_by_xpath("//*[contains(text(), 'I Accept')]").click()
+        #                 except e:
+        if (result > 0.5):
+            like_button = w8(self.driver, 8).until(
+                EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Like']"))).click()
+        else:
+            dislike_button = w8(self.driver, 8).until(
+                EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Nope']"))).click()
+
         # throws timeout exception(unhandled yet), but only if u interrupt
         self.real_user_stare()
         return True
@@ -125,28 +132,26 @@ class SeleniumSwiper:
         return list_of_url
 
     def handle_exceptions(self):
+        e = (exception.ElementClickInterceptedException, exception.ElementNotInteractableException,
+             exception.NoSuchElementException)
         while True:
             if self.driver.find_element_by_xpath('//*[contains(text(), "You\'re Out of Likes!")]').is_displayed():
                 i = 0
                 print("Tinder doesn\'t want me to date :<")
-                return False
+                return True
             try:
                 btn_noThanks = self.driver.find_element_by_xpath("//*[contains(text(), 'No Thanks')]").click()
-            except (exception.ElementNotInteractableException, exception.NoSuchElementException,
-                    exception.ElementClickInterceptedException) as e:
+            except e:
                 try:
                     match_button = self.driver.find_element_by_xpath("//*[contains(text(), 'Keep Swiping')]").click()
-                except (exception.ElementNotInteractableException, exception.NoSuchElementException,
-                        exception.ElementClickInterceptedException) as e:
+                except e:
                     try:
                         not_interessted_button = self.driver.find_element_by_xpath(
                             "//*[contains(text(), 'Not interested')]").click()
-                    except (exception.ElementNotInteractableException, exception.NoSuchElementException,
-                            exception.ElementClickInterceptedException) as e:
+                    except e:
                         try:
                             btn_iRefuse = self.driver.find_element_by_xpath("//*[contains(text(), 'I Accept')]").click()
-                        except (exception.ElementNotInteractableException, exception.NoSuchElementException,
-                                exception.ElementClickInterceptedException) as e:
+                        except e:
                             return False
 
     def get_her_photo(self):
@@ -163,7 +168,6 @@ class SeleniumSwiper:
         body = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main')
         body.click()
         tries = 3
-        i = 0
         while tries > 0:
             girls = topone.find_elements_by_xpath('.//*[@aria-label="' + girls_name + '"]')
             for i in girls:
@@ -178,14 +182,3 @@ class SeleniumSwiper:
             actions.move_to_element(body).send_keys(Keys.SPACE).perform()
         return self.scrap_url_list(raw_list_url)
 
-    # prototype function, user input will be replaced by AI
-    def judge_her(self, photos):
-        # photos=self.get_her_photo()
-        print(photos)
-        print(len(photos))
-        if (len(photos) == 1) & (photos[0].find("unknown.jpg") != -1):
-            return 1
-        result = int(input('do you like her? 1-10'))
-        # result=6
-
-        return True if result > 0.5 else False

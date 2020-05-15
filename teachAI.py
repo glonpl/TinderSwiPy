@@ -10,6 +10,7 @@ driver.real_user_stare()
 viewer = GUI(list([]))
 while True:
     viewer.setList(driver.get_her_photo())
-    driver.Swipe_it(viewer.pictureBrowser())
+    if driver.Swipe_it(viewer.pictureBrowser()):
+        break
 
 driver.close()
